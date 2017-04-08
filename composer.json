@@ -1,0 +1,24 @@
+{
+    "name": "asbsoft/yii2module-modmgr_1_161205",
+    "version": "1.*",
+    "description": "Simple modules manager",
+    "keywords": ["yii2"],
+    "type": "yii2-module",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Alexandr Belogolovsky",
+            "email": "ab2014box@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "yiisoft/yii2": "~2.0.10",
+        "asbsoft/yii2-common_2_170212": "~2.03"
+    },
+    "autoload": {
+        "psr-4": {
+            "asb\\yii2\\modules\\modmgr_1_161205\\": ""
+        }
+    }
+}

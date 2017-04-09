@@ -14,6 +14,9 @@ use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\base\BootstrapInterface;
 
+use Exception;
+use ReflectionClass;
+
 /**
  * This is the model class for table "{{%modmgr}}".
  *
@@ -150,17 +153,22 @@ class Modmgr extends DataModel
                 //?? how todo error processing
                 $config = @eval("return {$this->config_text};");//var_dump($config);exit;
                 if ($config !== false) $this->config_add = serialize($config);
-            } catch(\Exception $e) {
+            } catch(Exception $e) {
                 $this->addError('config_add', '(eval config_text) ' . $e->getMessage());
                 return false;
             }
 
             // setup empty $this->bootstrap
             if ($insert && empty($this->bootstrap)) {
-                // if in module dir exists file Bootstrap.php save it class name:
-//...todo
+                // set bootstrap property
+                $rc = new ReflectionClass($this->module_class);
+                $bootstrapFile = dirname($rc->getFileName()) . '/Bootstrap.php';
+                if (is_file($bootstrapFile)) {
+                    $this->bootstrap = $bootstrapFile; // exists file Bootstrap.php
+                } elseif ($rc->implementsInterface('yii\base\BootstrapInterface')) {
+                    $this->bootstrap = '+'; // module class implements BootstrapInterface
+                }//var_dump($this->bootstrap);exit;
 
-                // if module itself implements BootstrapInterface:
                 try { //?? how to catch yii\base\ErrorException Missing argument
                     if (!empty($config)) {
                         $configDefault = @eval("return {$this->config_default};");
@@ -169,11 +177,9 @@ class Modmgr extends DataModel
                         $id = $this->module_id;
                         if (!empty($this->parent_uid)) $id = $this->parent_uid . '/' . $id;
                         $config['id'] = $id;//var_dump($config);exit;
-//??                    $tmp = Yii::createObject($config, ['id' => $id]); //?? Missing required parameter "id" when instantiating "...\Module"
-//                      if ($tmp instanceof BootstrapInterface) $this->bootstrap = '+';
                     }
-                } catch(\Exception $e) {
-                    $this->addError('config_default', '(eval config_default or create obj on config) ' . $e->getMessage());
+                } catch(Exception $e) {
+                    $this->addError('config_default', '(eval config_default) ' . $e->getMessage());
                     return false;
                 }
             }
@@ -182,7 +188,7 @@ class Modmgr extends DataModel
             if (!empty($this->bootstrap) && $this->bootstrap != '+') {
                 try { //?? how to catch yii\base\ErrorException Class '...' not found
                     $tmp = new $this->bootstrap;
-                } catch(\Exception $e) {
+                } catch(Exception $e) {
                     $this->addError('bootstrap', '(new bootstrap) ' . $e->getMessage());
                     return false;
                 }
@@ -235,7 +241,7 @@ class Modmgr extends DataModel
                     $this->addError('module_class', $error = Yii::t($this->tc, 'Bad module class file'));
                     return;
                 }
-            } catch (\Exception $e) { // not catch syntax error
+            } catch (Exception $e) { // not catch syntax error
                 $this->addError('module_class', $error = Yii::t($this->tc, $e->getMessage()));
                 return;
             }

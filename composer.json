@@ -1,6 +1,5 @@
 {
     "name": "asbsoft/yii2module-modmgr_1_161205",
-    "version": "1.*",
     "description": "Simple modules manager",
     "keywords": ["yii2"],
     "type": "yii2-module",
@@ -16,6 +15,12 @@
         "yiisoft/yii2": "~2.0.10",
         "asbsoft/yii2-common_2_170212": "~2.03"
     },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/asbsoft/yii2-common_2_170212"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "asb\\yii2\\modules\\modmgr_1_161205\\": ""

@@ -4,13 +4,13 @@ return [
     //'params' => include(__DIR__ . '/params.php'),
 
     'baseTransCategory' => basename(dirname(__DIR__)),
-
+/*
     //'layoutPath' => '@asb/yii2/cms_3_170211/modules/sys/views/layouts',
     //'layoutPath' => '@project/views/layouts',
     'layouts' => [
         'backend'  => 'layout_admin',
     ],
-
+*/
     'routesConfig' => [ // default: type => prefix|[config]
       //'main'  => 'news',
         'admin' => 'admin/modmgr', // Yii2-base config

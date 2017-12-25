@@ -13,12 +13,12 @@
     "require": {
         "php": ">=5.4",
         "yiisoft/yii2": "~2.0.10",
-        "asbsoft/yii2-common_2_170212": "~2.05"
+        "asbsoft/yii2-common_2_170212": "~2.10"
     },
     "repositories": [
         {
             "type": "git",
-            "url": "https://github.com/asbsoft/yii2-common_2_170212"
+            "url": "https://github.com/asbsoft/yii2-common_2_170212.git"
         }
     ],
     "autoload": {

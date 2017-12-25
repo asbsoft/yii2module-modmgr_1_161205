@@ -6,7 +6,6 @@ use asb\yii2\modules\modmgr_1_161205\models\Modmgr as Model;
 
 use yii\db\Schema;
 use yii\db\Migration;
-use yii\db\Expression;
 
 /**
  * @author ASB <ab2014box@gmail.com>

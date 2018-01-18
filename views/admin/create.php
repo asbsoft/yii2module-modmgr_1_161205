@@ -1,12 +1,13 @@
 <?php
 
-use asb\yii2\common_2_170212\base\ModulesManager;
+    /* @var $this yii\web\View */
+    /* @var $model asb\yii2\modules\modmgr_1_161205\models\CreateModule */
 
-use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+    use asb\yii2\common_2_170212\base\ModulesManager;
 
-/* @var $this yii\web\View */
-/* @var $model asb\yii2\modules\modmgr_1_161205\models\CreateModule */
+    use yii\helpers\Html;
+    use yii\widgets\ActiveForm;
+
 
     $tc = $this->context->module->tcModule;
 
@@ -14,7 +15,7 @@ use yii\widgets\ActiveForm;
     $this->params['breadcrumbs'][] = ['label' => Yii::t($tc, 'Installed modules'), 'url' => ['index']];
     $this->params['breadcrumbs'][] = $this->title;
 
-    $modulesList = ModulesManager::modulesNamesList(Yii::$app, false, true);//var_dump($modulesList);
+    $modulesList = ModulesManager::modulesNamesList(Yii::$app, false, true);
 
 ?>
 <div class="modmgr-create">

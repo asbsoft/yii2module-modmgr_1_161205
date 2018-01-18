@@ -1,15 +1,16 @@
 <?php
 
-use asb\yii2\modules\modmgr_1_161205\assets\AdminAsset;
+    /* @var $this yii\web\View */
+    /* @var $model asb\yii2\modules\modmgr_1_161205\models\Modmgr */
 
-use asb\yii2\common_2_170212\base\ModulesManager;
+    use asb\yii2\modules\modmgr_1_161205\assets\AdminAsset;
 
-use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\widgets\ActiveForm;
+    use asb\yii2\common_2_170212\base\ModulesManager;
 
-/* @var $this yii\web\View */
-/* @var $model asb\yii2\modules\modmgr_1_161205\models\Modmgr */
+    use yii\helpers\Html;
+    use yii\helpers\Url;
+    use yii\widgets\ActiveForm;
+
 
     $textareaRows = 10;
     $tc = $this->context->module->tcModule;
@@ -21,10 +22,9 @@ use yii\widgets\ActiveForm;
     $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
     $this->params['breadcrumbs'][] = Yii::t('yii', 'Update');
 
-    $modulesList = ModulesManager::modulesNamesList(Yii::$app, false, true);//var_dump($modulesList);//var_dump($model->parent_uid);
+    $modulesList = ModulesManager::modulesNamesList(Yii::$app, false, true);
 
-    $messageRemove = addslashes(Yii::t($tc, 'Deinstall module {module}?', ['module' => $model->module_class]));//var_dump($messageRemove);
-    //$messageRemove = Yii::t($tc, 'Deinstall module?');
+    $messageRemove = addslashes(Yii::t($tc, 'Deinstall module {module}?', ['module' => $model->module_class]));
 
 ?>
 <div class="modmgr-update">
@@ -131,7 +131,7 @@ use yii\widgets\ActiveForm;
     $actionRemove = Url::toRoute(['delete', 'id' => $model->id]);
 
     $this->registerJs("
-        jQuery('#rebuild-config-default').bind('click', function() {//alert(jQuery('#config-default').text());
+        jQuery('#rebuild-config-default').bind('click', function() {
             jQuery('#rebuild-config-default').hide();
             jQuery('#config-load').show();
             jQuery('#config-default').load('{$actionChangeDefConfig}', {}, function() {
@@ -139,9 +139,9 @@ use yii\widgets\ActiveForm;
                 jQuery('#rebuild-config-default').show();
             });
         });
-        jQuery('#button-remove').bind('click', function() {//alert(this.form.action)
+        jQuery('#button-remove').bind('click', function() {
             if (confirm('{$messageRemove}')) {
-                this.form.action = '{$actionRemove}';//alert(this.form.action)
+                this.form.action = '{$actionRemove}';
                 this.form.submit();
             }
         });

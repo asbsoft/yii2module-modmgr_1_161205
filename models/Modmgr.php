@@ -45,7 +45,7 @@ class Modmgr extends DataModel
         parent::init();
 
         //if (empty($this->tc))
-        $this->tc = AdminController::$tcCommon;//var_dump($this->tc);
+        $this->tc = AdminController::$tcCommon;
 
     }
 
@@ -76,26 +76,26 @@ class Modmgr extends DataModel
             ['module_id', // can't be equal to static modules
               function ($attribute, $params) {
 /*
-                  $staticModulesIdsList = array_keys(Yii::$app->modules);//var_dump($staticModulesIdsList);
+                  $staticModulesIdsList = array_keys(Yii::$app->modules);
                   if (in_array($this->module_id, $staticModulesIdsList)) {
                       $this->addError($attribute, Yii::t($this->tc, 'already exists static module with same ID: ') . $this->module_id);
                   }
 */
-                  //$loadedModulesUidsList = array_keys(ModulesManager::$_dynModulesCache);// only dynamic
-                  $loadedModulesUidsList = array_keys(BaseModulesManager::modulesNamesList(null, false));//var_dump($loadedModulesUidsList);
-                  $uid = (empty($this->parent_uid) ? '' : ($this->parent_uid . '/')) . $this->module_id;//var_dump($uid);
-                  $changed = $this->isAttributeChanged('module_id') || $this->isAttributeChanged('parent_uid');//var_dump($changed);
+                  //$loadedModulesUidsList = array_keys(ModulesManager::$_dynModulesCache);
+                  $loadedModulesUidsList = array_keys(BaseModulesManager::modulesNamesList(null, false));
+                  $uid = (empty($this->parent_uid) ? '' : ($this->parent_uid . '/')) . $this->module_id;
+                  $changed = $this->isAttributeChanged('module_id') || $this->isAttributeChanged('parent_uid');
                   if ($changed && in_array($uid, $loadedModulesUidsList)) {
                       $this->addError($attribute, Yii::t($this->tc, 'already exists module with same uniqueId: ') . $uid);
-                  }//var_dump($this->errors);exit;
+                  }
               }
             ],
             ['parent_uid', //!! prevent modules loop
               function ($attribute, $params) {
-                  $numModId = ModulesManager::tonumberModuleId($this->module_id);//echo"? is '{$numModId}' in '{$this->parent_uid}'";//exit;
+                  $numModId = ModulesManager::tonumberModuleId($this->module_id);
                   if (strpos($this->parent_uid, $numModId) !== false) {
                       $this->addError($attribute, Yii::t($this->tc, "can't set itself as module-container"));
-                  }//var_dump($this->errors);exit;
+                  }
               }
             ],
         ];
@@ -106,7 +106,6 @@ class Modmgr extends DataModel
      */
     public function attributeLabels()
     {
-//var_dump($this->tc);exit;//??
         return [
             'id'             => 'ID',
             'module_id'      => Yii::t($this->tc, 'Module ID (alias)'),
@@ -143,15 +142,15 @@ class Modmgr extends DataModel
      * @inheritdoc
      */
     public function beforeSave($insert)
-    {//echo __METHOD__;var_dump($insert);var_dump($this->attributes);
+    {
 
         if (!parent::beforeSave($insert)) {
             return false;
         } else {
             // check additional config
-            try {//var_dump($this->config_text);
+            try {
                 //?? how todo error processing
-                $config = @eval("return {$this->config_text};");//var_dump($config);exit;
+                $config = @eval("return {$this->config_text};");
                 if ($config !== false) $this->config_add = serialize($config);
             } catch(Exception $e) {
                 $this->addError('config_add', '(eval config_text) ' . $e->getMessage());
@@ -167,7 +166,7 @@ class Modmgr extends DataModel
                     $this->bootstrap = $bootstrapFile; // exists file Bootstrap.php
                 } elseif ($rc->implementsInterface('yii\base\BootstrapInterface')) {
                     $this->bootstrap = '+'; // module class implements BootstrapInterface
-                }//var_dump($this->bootstrap);exit;
+                }
 
                 try { //?? how to catch yii\base\ErrorException Missing argument
                     if (!empty($config)) {
@@ -176,7 +175,7 @@ class Modmgr extends DataModel
                         $config['class'] = $this->module_class;
                         $id = $this->module_id;
                         if (!empty($this->parent_uid)) $id = $this->parent_uid . '/' . $id;
-                        $config['id'] = $id;//var_dump($config);exit;
+                        $config['id'] = $id;
                     }
                 } catch(Exception $e) {
                     $this->addError('config_default', '(eval config_default) ' . $e->getMessage());
@@ -207,28 +206,28 @@ class Modmgr extends DataModel
     {
         parent::afterFind();
 
-        $this->config_text = var_export(unserialize($this->config_add),true);//var_dump($this->config_text);exit;
+        $this->config_text = var_export(unserialize($this->config_add),true);
     }
 
     /** Load data from install model */
     public function loadData($installModel)
-    {//echo __METHOD__;var_dump($installModel->attributes);
+    {
 
         $this->is_active = false;
         $this->create_at = new Expression('NOW()'); // server time
         $this->module_id = $installModel->moduleId;
         $this->parent_uid = $installModel->parentUid;
 
-        $fileBody = file_get_contents($installModel->moduleClassFile->tempName);//var_dump($fileBody);
+        $fileBody = file_get_contents($installModel->moduleClassFile->tempName);
 
         //$regexp = "/namespace[ \t]+([A-Za-z0-9\\_]+);/"; //??
         $regexp = "/namespace[ \t]+([^;]+);/";
-        $n = preg_match($regexp, $fileBody, $found);//var_dump($found);
+        $n = preg_match($regexp, $fileBody, $found);
         if ($n < 1) {
             $this->addError('module_class', $error = Yii::t($this->tc, "Can't find namespace in module class file"));
             return;
         } else {
-            $this->module_class = $found[1] . "\\" . basename($installModel->moduleClassFile->name, '.php');//var_dump($this->module_class);exit;
+            $this->module_class = $found[1] . "\\" . basename($installModel->moduleClassFile->name, '.php');
             $cmd = "return {$this->module_class}::className();";
             if(function_exists('runkit_lint') && !runkit_lint($cmd)) {
                 $this->addError('module_class', $error = Yii::t($this->tc, 'Module class file has errors'));
@@ -236,7 +235,7 @@ class Modmgr extends DataModel
             }
 //*??
             try {
-                $className = @eval($cmd);//var_dump($className);exit;
+                $className = @eval($cmd);
                 if ($className != $this->module_class) {
                     $this->addError('module_class', $error = Yii::t($this->tc, 'Bad module class file'));
                     return;
@@ -264,19 +263,19 @@ class Modmgr extends DataModel
             }
             $this->config_text = var_export($config, true);
 
-        }//var_dump($this->attributes);var_dump($this->errors);//exit;
+        }
     }
 
     public function buildDefaultConfig($moduleClass)
-    {//echo __METHOD__."@{$moduleClass::className()}";
+    {
         $module = UniModule::getModuleByClassname($moduleClass, true); // load as anonimous
-        $configDefault = ConfigsBuilder::getConfig($module);//var_dump($configDefault);
+        $configDefault = ConfigsBuilder::getConfig($module);
 
         $params = ConfigsBuilder::getConfig($module, 'params');
         if (!empty($configDefault['params'])) {
-            $params = ArrayHelper::merge($configDefault['params'], $params);//var_dump($params);
+            $params = ArrayHelper::merge($configDefault['params'], $params);
         }
-        $configDefault['params'] = $params;//var_dump($configDefault);
+        $configDefault['params'] = $params;
 
         return $configDefault;
     }
@@ -285,21 +284,21 @@ class Modmgr extends DataModel
     protected static $_modulesData = [];
     /** Check if active dynamicly attached module */
     protected static function isActive($dbId)
-    {//echo __METHOD__."({$dbId})<br>";
+    {
         if (!isset(static::$_modulesData[$dbId])) {
-            $result = static::findOne($dbId);//
+            $result = static::findOne($dbId);
             static::$_modulesData[$dbId] = $result;
         }
         if (empty(static::$_modulesData[$dbId])) {
             return false;
         } else {
-            $isActive = static::$_modulesData[$dbId]->is_active;//var_dump($isActive);
+            $isActive = static::$_modulesData[$dbId]->is_active;
             return $isActive;
         }
     }
     /** Check if this module has unactive container */
     public function hasUnactiveContainer()
-    {//echo __METHOD__."({$this->id})<br>";
+    {
         $parent = $this->parent_uid;
         if (preg_match_all('|\{(\d+)\}|', $parent, $matches)) {
             if (!empty($matches[1])) {
@@ -313,15 +312,15 @@ class Modmgr extends DataModel
 
     /** Correct parent_uid chain if module-container change it's own name or container */
     public function correctParents($oldSubmodulesParentUid, $newSubmodulesParentUid)
-    {//echo __METHOD__."('$oldSubmodulesParentUid', '$newSubmodulesParentUid')<br>";
+    {
         if ($oldSubmodulesParentUid === $newSubmodulesParentUid) return;
 
-        $query = static::find()->where(['like', 'parent_uid', "{$oldSubmodulesParentUid}%", false]);//list($sql, $sqlParams) = Yii::$app->db->getQueryBuilder()->build($query);var_dump($sql);var_dump($sqlParams);
-        $list = $query->all();//var_dump(count($list));
-        foreach ($list as $item) {//echo'before:';var_dump($item->parent_uid);
+        $query = static::find()->where(['like', 'parent_uid', "{$oldSubmodulesParentUid}%", false]);
+        $list = $query->all();
+        foreach ($list as $item) {
             if (0 === strpos($item->parent_uid, $oldSubmodulesParentUid)) {
                 $item->parent_uid = $newSubmodulesParentUid
-                    . mb_substr($item->parent_uid, mb_strlen($oldSubmodulesParentUid));//echo'after:';var_dump($item->parent_uid);
+                    . mb_substr($item->parent_uid, mb_strlen($oldSubmodulesParentUid));
                 $item->save();
             }
         }

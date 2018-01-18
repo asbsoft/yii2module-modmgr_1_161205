@@ -1,17 +1,18 @@
 <?php
 
-use asb\yii2\modules\modmgr_1_161205\assets\AdminAsset;
-use asb\yii2\modules\modmgr_1_161205\models\Modmgr;
-use asb\yii2\modules\modmgr_1_161205\models\ModulesManager;
+    /* @var $this yii\web\View */
+    /* @var $dataProvider yii\data\ActiveDataProvider */
 
-use asb\yii2\common_2_170212\widgets\Alert;
+    use asb\yii2\modules\modmgr_1_161205\assets\AdminAsset;
+    use asb\yii2\modules\modmgr_1_161205\models\Modmgr;
+    use asb\yii2\modules\modmgr_1_161205\models\ModulesManager;
 
-use yii\grid\GridView;
-use yii\helpers\Html;
-use yii\helpers\Url;
+    use asb\yii2\common_2_170212\widgets\Alert;
 
-/* @var $this yii\web\View */
-/* @var $dataProvider yii\data\ActiveDataProvider */
+    use yii\grid\GridView;
+    use yii\helpers\Html;
+    use yii\helpers\Url;
+
 
     $gridViewId = 'modmgr-grid';
     $gridHtmlClass = 'modmgr-list-grid';
@@ -125,7 +126,7 @@ use yii\helpers\Url;
                           , 'sort' => $this->params['buttonOptions']['data']['sort']
                           , $formName => $this->params['buttonOptions']['data']['search']
                           , 'page' => $pager->page + 1
-                        ]);//var_dump($url);
+                        ]);
                         return Html::a("<span class='glyphicon glyphicon-{$icon}'></span>", $url, $options);
                     },
                     'add-submodule' => function($url, $model, $key) use($tc, $pager, $formName) {
@@ -140,7 +141,7 @@ use yii\helpers\Url;
                           , 'sort' => $this->params['buttonOptions']['data']['sort']
                           , $formName => $this->params['buttonOptions']['data']['search']
                           , 'page' => $pager->page + 1
-                        ]);//var_dump($url);
+                        ]);
                         return Html::a("<span class='glyphicon glyphicon-plus'></span>", $url, $options);
                     },
                 ],

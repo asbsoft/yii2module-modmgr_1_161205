@@ -59,7 +59,7 @@ class AdminController extends BaseAdminMulangController
     public function actionIndex($page = 1)
     {
         $sort = [];
-        $params = Yii::$app->request->queryParams;//var_dump($params);
+        $params = Yii::$app->request->queryParams;
         if (empty($params['sort'])) {
             $sort['defaultOrder'] = ['parent_uid' => SORT_ASC, 'module_id' => SORT_ASC];
         } else {
@@ -71,7 +71,7 @@ class AdminController extends BaseAdminMulangController
                 unset($params['sort']);
             }
             Yii::$app->request->setQueryParams($params);
-        }//var_dump($sort);
+        }
 
         $dataProvider = new ActiveDataProvider([
             'query' => Modmgr::find(),
@@ -123,22 +123,22 @@ class AdminController extends BaseAdminMulangController
     {
         $installModel = new CreateModule(['tc' => $this->module->tcModule]);
 
-        $post = Yii::$app->request->post();//var_dump($post);
+        $post = Yii::$app->request->post();
         if (empty($post)) {
             $installModel->loadDefaultValues();
-            $installModel->parentUid = ModulesManager::numberedIdFromDbId($parent);//var_dump($installModel->attributes);
+            $installModel->parentUid = ModulesManager::numberedIdFromDbId($parent);
         } else {
             $installModel->load($post);
-            $installModel->moduleClassFile = UploadedFile::getInstance($installModel, 'moduleClassFile');//var_dump($installModel->attributes);
-            $result = $installModel->validate();//var_dump($installModel->errors);
+            $installModel->moduleClassFile = UploadedFile::getInstance($installModel, 'moduleClassFile');
+            $result = $installModel->validate();
             if ($result) {
                 //$modelManager = new Modmgr(['tc' => $this->module->tcModule]);
                 $modelManager = new Modmgr();
-                $modelManager->loadData($installModel);//var_dump($modelManager->errors);exit;
+                $modelManager->loadData($installModel);
                 if (!$modelManager->hasErrors() && $modelManager->save()) {
                     //return $this->redirect(['view', 'id' => $modelManager->id]);
                     return $this->redirect(['update', 'id' => $modelManager->id]);
-                }//var_dump($modelManager->errors);
+                }
 
                 // merge errors to $installModel
                 foreach ($modelManager->errors as $attribute => $errors) {
@@ -147,9 +147,9 @@ class AdminController extends BaseAdminMulangController
                     } elseif ($attribute == 'module_class') {
                         foreach ($errors as $error) $installModel->addError('moduleClassFile', $error);
                     } else { //?? need error message not attached to any field
-                        foreach ($errors as $error) $installModel->addError('moduleClassFile', $error);//??
+                        foreach ($errors as $error) $installModel->addError('moduleClassFile', $error);
                     }
-                }//var_dump($installModel->errors);exit;                
+                }
             }
         }
         return $this->render('create', [
@@ -164,12 +164,12 @@ class AdminController extends BaseAdminMulangController
      * @return mixed
      */
     public function actionUpdate($id)
-    {//echo __METHOD__;
-        $model = $this->findModel($id);//var_dump($model->config_text);
+    {
+        $model = $this->findModel($id);
         $oldSubmodulesParentUid = $model->parent_uid . '/{' . $model->id . '}';
 
-        $post = Yii::$app->request->post();//var_dump($post);
-        $loaded = $model->load($post);//var_dump($model->config_text);var_dump($model->attributes);
+        $post = Yii::$app->request->post();
+        $loaded = $model->load($post);
         if ($loaded && $model->save()) {
             $newSubmodulesParentUid = $model->parent_uid . '/{' . $model->id . '}';
             $model->correctParents($oldSubmodulesParentUid, $newSubmodulesParentUid);
@@ -200,7 +200,7 @@ class AdminController extends BaseAdminMulangController
             Yii::$app->session->setFlash('error', Yii::t($this->tcModule,"Can't delete active module"));
         }
 
-        $params = Yii::$app->request->getQueryParams();//var_dump($params);exit;
+        $params = Yii::$app->request->getQueryParams();
         $params['id'] = $model->id;
         $params[] = 'index';
         return $this->redirect($params);
@@ -212,13 +212,13 @@ class AdminController extends BaseAdminMulangController
      * @return mixed
      */
     public function actionChangeActive($id)
-    {//echo __METHOD__;
+    {
         $model = $this->findModel($id);
         $model->is_active = $model->is_active ? false: true;
         $model->save();
         Yii::$app->session->setFlash('success', Yii::t($this->tcModule,"Module's activity has been changed"));
 
-        $params = Yii::$app->request->getQueryParams();//var_dump($params);exit;
+        $params = Yii::$app->request->getQueryParams();
         $params['id'] = $model->id;
         $params[] = 'index';
         return $this->redirect($params);

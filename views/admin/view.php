@@ -1,12 +1,13 @@
 <?php
 
-use asb\yii2\modules\modmgr_1_161205\assets\AdminAsset;
+    /* @var $this yii\web\View */
+    /* @var $model asb\yii2\modules\modmgr_1_161205\models\Modmgr */
 
-use yii\helpers\Html;
-use yii\widgets\DetailView;
+    use asb\yii2\modules\modmgr_1_161205\assets\AdminAsset;
 
-/* @var $this yii\web\View */
-/* @var $model asb\yii2\modules\modmgr_1_161205\models\Modmgr */
+    use yii\helpers\Html;
+    use yii\widgets\DetailView;
+
 
     $assets = AdminAsset::register($this);
 
@@ -35,7 +36,7 @@ use yii\widgets\DetailView;
     <?= DetailView::widget([
         'model' => $model,
         //'template' => '<tr><th>{label}</th><td>{value}</td></tr>', // default
-        'template' => function ($attribute, $index, $widget) {//var_dump($attribute);exit;
+        'template' => function ($attribute, $index, $widget) {
             if ($attribute['attribute'] == 'config_add') $classes = "pre pre-scrollable";
             else $classes = '';
             $template = "<tr><th>{label}</th><td class=\"{$classes}\">{value}</td></tr>";

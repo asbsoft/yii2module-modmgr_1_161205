@@ -30,7 +30,7 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
      */
     public static function uniqueIdFromDbId($id)
     {
-        //if (empty(static::$_dynModulesCache)) Yii::createObject(static::className());//var_dump((static::$_dynModulesCache));exit;
+        //if (empty(static::$_dynModulesCache)) Yii::createObject(static::className());
         foreach (static::$_dynModulesCache as $muid => $info) {
             if ($id == $info['id']) {
                 return $muid;
@@ -44,7 +44,7 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
      * @return string in format '.../{NNN}/...'
      */
     public static function numberedIdFromDbId($id)
-    {//echo __METHOD__."($id)";
+    {
         foreach (static::$_dynModulesCache as $moduleInfo) {
             if ($moduleInfo['id'] == $id) {
                 return $moduleInfo['module_uid_expanded'];
@@ -72,7 +72,7 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
      */
     public static function tonumberModuleUniqueId($muid)
     {
-        if (!empty(static::$_dynModulesCache[$muid]['module_uid'])) {//echo __METHOD__."($uid)";var_dump(static::$_dynModulesCache[$uid]);exit;
+        if (!empty(static::$_dynModulesCache[$muid]['module_uid'])) {
             $muid = static::$_dynModulesCache[$muid]['module_uid'];
         }
         return $muid;
@@ -98,11 +98,11 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
     protected function getDynModulesCache()
     {
         if (empty(static::$_dynModulesCache)) {
-            $list = $this::find()->select(['id', 'module_id', 'parent_uid', 'is_active'])->asArray()->all();//var_dump($list);exit;
+            $list = $this::find()->select(['id', 'module_id', 'parent_uid', 'is_active'])->asArray()->all();
             foreach ($list as $item) {
                 static::$_dynModulesIdsTrans['{' . $item['id'] . '}'] = $item['module_id'];
                 static::$_dynModulesTransToIds[$item['module_id']] = '{' . $item['id'] . '}';
-            }//var_dump(static::$_dynModulesIdsTrans);var_dump(static::$_dynModulesTransToIds);exit;
+            }
             reset($list);
             $cache = [];
             foreach ($list as $item) {
@@ -113,7 +113,7 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
                 $item['parentUniqueId'] = $item['parent_uid'];
 /*
                 $numParentUid = $item['parent_uid'];
-                $numParentUid = static::expandNumberMuid($numParentUid);//??
+                $numParentUid = static::expandNumberMuid($numParentUid);
                 $parentUniqueId = static::fromnumberModuleUniqueId($numParentUid);
                 $item['parentUniqueId'] = $parentUniqueId;
 */
@@ -122,7 +122,7 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
 
                 //$cache[$moduleUniqueId] = $item;
                 $cache['{' . $item['id'] . '}'] = $item;
-            }//echo __METHOD__;var_dump(array_keys(static::$_dynModulesCache));//var_dump(static::$_dynModulesCache);exit;
+            }
             static::$_dynModulesCache = static::fixDynModulesCache($cache);
         }
         return static::$_dynModulesCache;
@@ -130,12 +130,12 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
 
     /** Expand one-number module's uniqueId into chain */
     protected static function fixDynModulesCache($cache)
-    {//echo __METHOD__;var_dump($cache);
+    {
         $result = [];
-        foreach ($cache as $numMid => $info) {//echo"({$info['id']}){$numMid} => parent='{$info['parent_uid']}'<br>";
+        foreach ($cache as $numMid => $info) {
             $expParentUid = $parentNumber = $info['parent_uid'];
             while (!empty($parentNumber)) {
-                //if (preg_match('/\{\d+\}/', $parentNumber, $matches) == 0) break;//var_dump($matches);exit;
+                //if (preg_match('/\{\d+\}/', $parentNumber, $matches) == 0) break;
                 //$idx = $matches[0];
                 //if (empty($cache[$idx]['parent_uid'])) break;
                 //else $parentNumber = $cache[$idx]['parent_uid'];
@@ -143,13 +143,13 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
                 if (empty($cache[$parentNumber]['parent_uid'])) break;
                 else $parentNumber = $cache[$parentNumber]['parent_uid'];
                 $expParentUid = $parentNumber . '/' . $expParentUid;
-            }//echo"parent'{$info['parent_uid']}' expanded to '{$expParentUid}'<br>";
+            }
 
             $cache[$numMid]['parent_uid_expanded'] = $expParentUid;
             $cache[$numMid]['module_uid_expanded'] = (empty($expParentUid) ? '' : ($expParentUid . '/')) . $numMid;
             $idx = static::fromnumberModuleUniqueId($cache[$numMid]['module_uid_expanded']);
             $result[$idx] = $cache[$numMid];
-        }//var_dump($result);exit;
+        }
         return $result;
     }
 
@@ -157,7 +157,7 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
     public static function registeredModuleName($moduleUid)
     {
         if (!empty(static::$_dynModulesCache[$moduleUid]['name'])) {
-            $name = static::$_dynModulesCache[$moduleUid]['name'];//echo __METHOD__."($moduleUid) => {$name}<br>";
+            $name = static::$_dynModulesCache[$moduleUid]['name'];
             return $name;
         }
         return false;
@@ -171,10 +171,10 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
      * @return array of submodules configs
      */
     public function getSubmodules($module, $onlyActivated = true)
-    {//echo __METHOD__."('{$module->uniqueId}','{$onlyActivated}')<br>";
+    {
         $result = [];
 
-        $allDynModules = $this->getDynModulesCache();//var_dump($allDynModules);exit;
+        $allDynModules = $this->getDynModulesCache();
 
         if (!isset($module->uniqueId)) { // $module->uniqueId may be ''
             return $result;
@@ -182,7 +182,7 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
         $uniqueIdNumeric = empty($allDynModules[$module->uniqueId])
             ? $module->uniqueId
             : $allDynModules[$module->uniqueId]['module_uid']
-            ;//var_dump($uniqueIdNumeric);
+            ;
         $where = [];
         if ($onlyActivated) {
             $where['is_active'] = true;
@@ -192,22 +192,22 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
         } else {
             $where['parent_uid'] = $uniqueIdNumeric;
         }
-        $query = $this::find()->where($where);//list($sql, $sqlParams) = Yii::$app->db->getQueryBuilder()->build($query);var_dump($sql);var_dump($sqlParams);
+        $query = $this::find()->where($where);
         $list = $query->all();
         
-        foreach ($list as $item) {//var_dump($item->attributes);
+        foreach ($list as $item) {
             $config = [];
-            $config = unserialize($item->config_add);//var_dump($item->config_add);var_dump($config);echo'<hr>';
+            $config = unserialize($item->config_add);
             $config['class'] = $item->module_class;
 
             $result[$item->module_id] = $config;
-        }//var_dump(array_keys($result));//exit;
+        }
         return $result;
     }
 
     /** Correct URL prefixes */
     protected function fixUrlPrefixes($moduleUid, $routesConfig)
-    {//echo __METHOD__.'<br>';
+    {
         $result = [];
         $module = Yii::$app->getModule($moduleUid);
         foreach ($routesConfig as $type => $config) {
@@ -222,7 +222,7 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
                 }
             }
             $result[$type] = $config;
-        }//echo __METHOD__;var_dump($result);
+        }
         return $result;
     }
 
@@ -231,17 +231,18 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
      * @return array in format [bootstrap class or module's uniqueId => config]
      */
     public function getBootstrapList($parentModuleUid = '')
-    {//echo __METHOD__."($parentModuleUid)<br>";
+    {
         $where = ['is_active' => true];
         if (!empty($parentModuleUid)) {
             $parentModuleUid = static::tonumberModuleUniqueId($parentModuleUid);
             $where['parent_uid'] = $parentModuleUid;
         }
-        $query = $this::find()->where($where);//list($sql, $sqlParams) = Yii::$app->db->getQueryBuilder()->build($query);var_dump($sql);var_dump($sqlParams);
+        $query = $this::find()->where($where);
+        //list($sql, $sqlParams) = Yii::$app->db->getQueryBuilder()->build($query);var_dump($sql);var_dump($sqlParams);
         $list = $query->all();
 
         $result = [];
-        foreach ($list as $item) {//var_dump($item->attributes);
+        foreach ($list as $item) {
             if (!empty($item->bootstrap) && is_string($item->bootstrap)) {
                 $config = [];
 
@@ -263,7 +264,7 @@ class ModulesManager extends Modmgr implements ModulesManagerInterface
                 }
                 $result[$boot] = $config;
             }
-        }//echo __METHOD__;var_dump($result);//exit;
+        }
         return $result;
     }
 
